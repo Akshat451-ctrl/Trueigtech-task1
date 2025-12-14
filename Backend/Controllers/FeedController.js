@@ -38,7 +38,8 @@ class FeedController {
 }
    static async getFeeds(req, res) {
   try {
-    const result = await FeedModel.getAllFeeds();
+    const { currentUserId } = req.body;
+    const result = await FeedModel.getAllFeeds(currentUserId);
 
     if (result && result.length > 0) {
       return res.status(200).json({
@@ -61,6 +62,92 @@ class FeedController {
       message: "Internal server error"
     });
   }
+}
+
+static async followUser(req, res){
+    try{
+        const followingUserId = req.params.id;
+        const {currentUserId} = req.body;
+
+        const result = await FeedModel.followUser(currentUserId,followingUserId);
+        console.log(result, "Follow User Result");
+        if (result && result.affectedRows > 0) {
+            return res.status(200).json({
+                status: "success",
+                message: "Followed successfully",
+                data: result
+            });
+        }
+
+        return res.status(200).json({
+                status: "success",
+                message: "Something went wrong",
+                data: result
+        });
+
+    }catch(error){
+        console.error(error);
+        return res.status(500).json({
+        status: false,
+        message: "Internal server error"
+        });
+    }
+}
+
+
+static async exploreUsers(req, res){
+    try{
+        const {currentUserId} = req.body;
+
+        const result = await FeedModel.exploreUsers(currentUserId);
+        if (result && result.length > 0) {
+            return res.status(200).json({
+                status: "success",
+                data: result
+            });
+        }
+
+        return res.status(200).json({
+                status: "success",
+                message: "Something went wrong",
+                data: result
+        });
+
+    }catch(error){
+        console.error(error);
+        return res.status(500).json({
+        status: false,
+        message: "Internal server error"
+        });
+    }
+}
+
+static async likePost(req, res){
+    try{
+        const postId = req.params.id;
+        const {currentUserId} = req.body;
+
+        const result = await FeedModel.likePost(currentUserId, postId);
+        if (result && result.length > 0) {
+            return res.status(200).json({
+                status: "success",
+                data: result
+            });
+        }
+
+        return res.status(200).json({
+                status: "success",
+                message: "Something went wrong",
+                data: result
+        });
+
+    }catch(error){
+        console.error(error);
+        return res.status(500).json({
+        status: false,
+        message: "Internal server error"
+        });
+    }
 }
 
 }

@@ -4,6 +4,8 @@ import Login from "./Pages/Login";
 import Signup from "./Pages/Signup";
 import Dashboard from "./Pages/Dashboard";
 import ProtectedRoute from "./Pages/ProtectedRoute";
+import ExploreUsers from "./Pages/ExploreUsers";
+
 
 export default function App() {
   return (
@@ -25,6 +27,16 @@ export default function App() {
           element={
             <ProtectedRoute>
               <Dashboard />
+               
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/explore"
+          element={
+            <ProtectedRoute>
+              <ExploreUsers />
             </ProtectedRoute>
           }
         />

@@ -10,6 +10,9 @@ const upload = multer({
 router.post("/login",upload.any(),asyncHandler(AuthController.Login) );
 router.post("/signup",upload.any(),asyncHandler(AuthController.signup) );
 router.post("/insertFeed",upload.any(),asyncHandler(FeedController.insertFeed) );
-router.get("/getFeed",asyncHandler(FeedController.getFeeds) );
+router.post("/getFeed", upload.none(),asyncHandler(FeedController.getFeeds) );
+router.post("/user/:id/follow",upload.none(), asyncHandler(FeedController.followUser));
+router.post("/exploreUsers", upload.none(), asyncHandler(FeedController.exploreUsers));
+router.post("/post/:id/like", upload.none(), asyncHandler(FeedController.likePost));
 
 export default router;

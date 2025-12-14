@@ -6,9 +6,10 @@ import {
   MessageCircle,
   UserPlus,
 } from "lucide-react";
-import { insertpost, getFeed } from "../APIS/Api/FeedApi";
+import { insertpost, getFeed, followUser, likePost } from "../APIS/Api/FeedApi";
 import { useDispatch, useSelector } from "react-redux";
 import Cookies from "js-cookie";
+import { current } from "@reduxjs/toolkit";
 
 const BASE_URL = "http://localhost:5000/";
 
@@ -23,10 +24,11 @@ export default function Dashboard() {
   const dispatch = useDispatch();
 
   const feedData = useSelector((state) => state.feedSlice.feedData);
+  const followingData = useSelector((state) => state.feedSlice.followingData);
 
   useEffect(() => {
     (async () => {
-      await dispatch(getFeed());
+      await dispatch(getFeed({ currentUserId: userId }));
     })();
   }, [dispatch]);
 
@@ -58,12 +60,12 @@ export default function Dashboard() {
       setText("");
       setMedia([]);
       setPreview([]);
-      dispatch(getFeed());
+      dispatch(getFeed({ currentUserId: userId }));
     }
   };
 
   
-  const handleLikeToggle = (feedId) => {
+  const handleLikeToggle = async (feedId) => {
     setLikes((prev) => {
       const current = prev[feedId] || { liked: false, count: 0 };
 
@@ -75,10 +77,13 @@ export default function Dashboard() {
         },
       };
     });
+
+    await dispatch(likePost({ postId: feedId, currentUserId: userId }));
+    dispatch(getFeed({ currentUserId: userId }));
   };
 
   
-  const handleFollowToggle = (post) => {
+  const handleFollowToggle = async (post) => {
     setFollowing((prev) => {
       if (prev[post.user_id]) {
         const updated = { ...prev };
@@ -94,6 +99,9 @@ export default function Dashboard() {
         },
       };
     });
+
+    await dispatch(followUser({ followedUserId: userId, currentUserId: post.user_id }));
+    await dispatch(getFeed({ currentUserId: userId }));
   };
 
   return (
@@ -103,6 +111,15 @@ export default function Dashboard() {
         
         <div className="col-span-12 md:col-span-8 space-y-6">
 
+            <div className="bg-gray-950 border border-gray-800 rounded-3xl p-6">
+                <div className="w-100 flex items-center">
+                    <h2 className="text-xl font-semibold mb-3 d-block">Insta.</h2>
+                    <ul>
+                        <a href="/explore"><li className="mt-[-8px] ms-4 cursor-pointer">Explore People</li></a>
+                    </ul>
+                </div>
+            
+          </div>
          
           <div className="bg-gray-950 border border-gray-800 rounded-3xl p-6">
             <h2 className="text-xl font-semibold mb-3">Create Post</h2>
@@ -164,18 +181,19 @@ export default function Dashboard() {
                 
                 <div className="flex justify-between items-center">
                   <div className="font-semibold">@{post.username}</div>
-
+                {post.user_id !== Number(userId) && 
                   <button
                     onClick={() => handleFollowToggle(post)}
                     className={`flex items-center gap-1 px-3 py-1 rounded-full text-sm transition ${
-                      following[post.user_id]
-                        ? "bg-gray-700"
-                        : "bg-blue-600"
+                      
+                         "bg-gray-700"
+                       
                     }`}
                   >
                     <UserPlus size={14} />
-                    {following[post.user_id] ? "Following" : "Follow"}
+                    following
                   </button>
+            }
                 </div>
 
            
@@ -190,7 +208,7 @@ export default function Dashboard() {
                     <img
                       src={mediaUrl}
                       alt="feed"
-                      className="w-full max-h-[400px] object-cover"
+                      className="max-h-[400px] object-fit m-auto"
                     />
                   )
                 )}
@@ -203,7 +221,7 @@ export default function Dashboard() {
                   <button
                     onClick={() => handleLikeToggle(post.feed_id)}
                     className={`flex items-center gap-1 ${
-                      likes[post.feed_id]?.liked
+                      post.isLiked === 1
                         ? "text-pink-500"
                         : "hover:text-pink-500"
                     }`}
@@ -211,12 +229,12 @@ export default function Dashboard() {
                     <Heart
                       size={18}
                       fill={
-                        likes[post.feed_id]?.liked
+                        post.isLiked === 1
                           ? "currentColor"
                           : "none"
                       }
                     />
-                    {likes[post.feed_id]?.count || 0}
+                    {post.count || 0}
                   </button>
 
                   <button className="flex items-center gap-1 hover:text-blue-400">
@@ -232,20 +250,20 @@ export default function Dashboard() {
           <div className="bg-gray-950 border border-gray-800 rounded-3xl p-5 sticky top-6">
             <h3 className="text-lg font-semibold mb-4">Following</h3>
 
-            {Object.keys(following).length === 0 ? (
+            {followingData.length === 0 ? (
               <p className="text-sm text-gray-400">
                 Follow users to see them here.
               </p>
             ) : (
               <div className="space-y-4">
-                {Object.values(following).map((user) => (
+                {followingData.map((user) => (
                   <div
                     key={user.user_id}
                     className="flex items-center justify-between"
                   >
                     <div className="flex items-center gap-3">
                       <div className="h-10 w-10 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center font-bold">
-                        {user.username.charAt(0).toUpperCase()}
+                        {user.username?.charAt(0).toUpperCase()}
                       </div>
                       <div>
                         <p className="text-sm font-medium">
