@@ -13,6 +13,7 @@ router.post('/signup', async (req, res) => {
   if (findUserByEmail(email)) return res.status(400).json({ error: 'Email already used' });
 
   const hash = await bcrypt.hash(password, 10);
+  
   const user = createUser({ email, username, passwordHash: hash });
   
   const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '7d' });

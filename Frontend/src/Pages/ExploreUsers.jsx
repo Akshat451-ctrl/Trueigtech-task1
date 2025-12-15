@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { exploreUsers, followUser, getFeed } from "../APIS/Api/FeedApi";
 import Cookies from "js-cookie";
 import { current } from "@reduxjs/toolkit";
+import Nav from "../Components/Nav";
 
 export default function ExploreUsers() {
   const dispatch = useDispatch();
@@ -52,6 +53,7 @@ export default function ExploreUsers() {
 
   return (
     <div className="min-h-screen bg-black text-white p-6">
+      <Nav />
       <div className="max-w-5xl mx-auto">
 
         <h2 className="text-2xl font-semibold mb-6">

@@ -10,6 +10,7 @@ import { insertpost, getFeed, followUser, likePost } from "../APIS/Api/FeedApi";
 import { useDispatch, useSelector } from "react-redux";
 import Cookies from "js-cookie";
 import { current } from "@reduxjs/toolkit";
+import Nav from "../Components/Nav";
 
 const BASE_URL = "http://localhost:5000/";
 
@@ -106,20 +107,13 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-black text-white p-4">
+        <Nav />
       <div className="max-w-6xl mx-auto grid grid-cols-12 gap-6 items-start">
-
+        
         
         <div className="col-span-12 md:col-span-8 space-y-6">
 
-            <div className="bg-gray-950 border border-gray-800 rounded-3xl p-6">
-                <div className="w-100 flex items-center">
-                    <h2 className="text-xl font-semibold mb-3 d-block">Insta.</h2>
-                    <ul>
-                        <a href="/explore"><li className="mt-[-8px] ms-4 cursor-pointer">Explore People</li></a>
-                    </ul>
-                </div>
-            
-          </div>
+          
          
           <div className="bg-gray-950 border border-gray-800 rounded-3xl p-6">
             <h2 className="text-xl font-semibold mb-3">Create Post</h2>
